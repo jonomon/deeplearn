@@ -3,7 +3,6 @@
 
 import pandas as pd
 import numpy as np
-from src import *
 from keras.models import Sequential
 from keras.layers.core import Flatten, Dense, Dropout
 from keras.layers.convolutional import Convolution2D, MaxPooling2D, ZeroPadding2D
