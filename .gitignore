@@ -1,4 +1,5 @@
 data/*
+.idea/*
 *~
 *.xml
 imageFeatures/weights/*
