@@ -2,6 +2,7 @@ import pandas as pd
 from urllib2 import urlopen, URLError, HTTPError
 import bs4
 
+
 def file_image_url(image_id, html):
     soup = bs4.BeautifulSoup(html, "lxml")
     imgs = soup.findAll(
@@ -22,6 +23,7 @@ def file_image_url(image_id, html):
     img_url = imgs[0]['src']
     return img_url
 
+
 def pull_files(image_id, output_folder):
     url_base = "http://www.dpchallenge.com/image.php?IMAGE_ID="
     url = url_base + str(image_id)
@@ -37,7 +39,7 @@ def pull_files(image_id, output_folder):
         print "HTTP Error:", e.code, url
     except URLError, e:
         print "URL Error:", e.reason, url
-    except e:
+    except Exception as e:
         print e.message
 
 if __name__ == "__main__":
