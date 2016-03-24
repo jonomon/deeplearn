@@ -39,11 +39,10 @@ def pull_files(image_id, output_folder):
         print "URL Error:", e.reason, url
     except e:
         print e.message
-    import pdb; pdb.set_trace();
 
 if __name__ == "__main__":
     filename = "AVA_dataset/aesthetics_image_lists/fooddrink_train.jpgl"
-    output_folder = "../data/"
+    output_folder = "../data/original/"
     input_file = pd.read_csv(filename, header=None)
     for idx, row in input_file.iterrows():
         pull_files(row[0], output_folder)

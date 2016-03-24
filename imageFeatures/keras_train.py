@@ -91,7 +91,7 @@ if __name__ == "__main__":
     sgd = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
     model.compile(optimizer=sgd, loss='categorical_crossentropy')
     
-    directory = "./data/" #input directory
+    directory = "../data/resized_224/" #input directory
     features = []
     filenames = []
     input_images = glob.glob(directory+'/*jpg')

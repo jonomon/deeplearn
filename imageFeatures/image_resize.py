@@ -8,8 +8,8 @@ import os
 import glob
 from joblib import Parallel, delayed
 
-in_dir = 'data/'
-out_dir = 'data/resized_224/'
+in_dir = '../data/original/'
+out_dir = '../data/resized_224/'
 IMAGE_SIZE = 224
 
 from PIL import Image, ImageChops
