@@ -18,6 +18,8 @@ def rot_crop_all():
 
 def rot_crop(img_file):
     im = Image.open(img_file)
+    if len(im.split()) == 1:
+        im = im.convert('RGB')
     (x, y) = im.size
 
     if x > y:
