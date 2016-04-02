@@ -92,13 +92,14 @@ if __name__ == "__main__":
     model.compile(optimizer=sgd, loss='categorical_crossentropy')
     
     directory = "../data/resized_224/" #input directory
+    directory = "../data/rot/"
     features = []
     filenames = []
-    input_images = glob.glob(directory+'/*jpg')
+    input_images = glob.glob(directory+'/*ppm')
     for i, filename in enumerate(input_images):
         print("{0}/{1} Analysing {2}".format(i, len(input_images), filename))
         output = getOutput(model, filename)
         filenames.append(filename)
         features.append(output)
     f = pd.DataFrame(np.concatenate(features), index=filenames)
-    f.to_csv("outputFeatures/image_features.csv")
+    f.to_csv("outputFeatures/image_features2.csv")
