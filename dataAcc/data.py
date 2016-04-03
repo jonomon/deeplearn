@@ -1,6 +1,7 @@
 import pandas as pd
 from urllib2 import urlopen, URLError, HTTPError
 import bs4
+import glob
 
 
 def file_image_url(image_id, html):
@@ -43,8 +44,12 @@ def pull_files(image_id, output_folder):
         print e.message
 
 if __name__ == "__main__":
-    filename = "AVA_dataset/aesthetics_image_lists/fooddrink_train.jpgl"
+    in_dir = "AVA_dataset/aesthetics_image_lists/"
+    #filenames = glob.glob(in_dir+'*.jpgl')
+    filenames = glob.glob(in_dir + '*fooddrink*.jpgl')
+
     output_folder = "../data/original/"
-    input_file = pd.read_csv(filename, header=None)
-    for idx, row in input_file.iterrows():
-        pull_files(row[0], output_folder)
+    for filename in filenames:
+        input_file = pd.read_csv(filename, header=None)
+        for idx, row in input_file.iterrows():
+            pull_files(row[0], output_folder)

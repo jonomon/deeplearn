@@ -1,14 +1,14 @@
 import numpy as np
+import pandas as pd
 from os.path import basename
 from os.path import splitext
+import glob
 
 ava_file = "AVA_dataset/AVA.txt"
 
 image_features_file = "../imageFeatures/outputFeatures/image_features.csv"
 
-food_list_test_file = "AVA_dataset/aesthetics_image_lists/fooddrink_test.jpgl"
-food_list_train_file = "AVA_dataset/aesthetics_image_lists/fooddrink_train.jpgl"
-
+train_test_image_dir = "AVA_dataset/aesthetics_image_lists/"
 output_path = "../data/labels/label.csv"
 
 def error(str):
@@ -23,17 +23,15 @@ def get_score(line):
 
 # get test and train image ids for food pictures
 def get_ids():
-    test_ids = []
-    train_ids = []
-    with open(food_list_test_file) as infile:
-        for line in infile:
-            test_ids.append(line.strip())
+    #filenames = glob.glob(train_test_image_dir+'*.jpgl')
+    filenames = glob.glob(train_test_image_dir + '*fooddrink*.jpgl')
+    ids = []
 
-    with open(food_list_train_file) as infile:
-        for line in infile:
-            train_ids.append(line.strip())
-
-    return test_ids, train_ids
+    for filename in filenames:
+        with open(filename) as infile:
+            for line in infile:
+                ids.append(line.strip())
+    return ids
 
 
 # build the ava.txt file into a dictionary, indexed by image id string
@@ -49,7 +47,6 @@ def build_ava_dictionary():
                 error( "Abort: duplicate image found! possible data corruption!")
             else:
                 ava_dict[img_id] = line
-
     return ava_dict
 
 
@@ -94,24 +91,28 @@ def get_labels_for_images_with_features():
             if image_name is not "":
                 img_ids.append(splitext(basename(image_name))[0])
 
-    test_ids, train_ids = get_ids()
+    ids = get_ids()
 
     ava_dict = build_ava_dictionary()
 
     # train & test images combined!
     labels = []
+    ids = []
 
     for img_id in img_ids:
         if img_id in ava_dict:
             score = get_score(ava_dict[img_id])
-            if img_id in test_ids or img_id in train_ids:
+            if img_id in ids:
                 labels.append(score)
+                ids.append(img_id)
             else:
                 error("Abort: image not found as train or test, possible data corruption!")
         else:
-            error("Abort: image not found in AVA.txt, possible data corruption!")
+            print("Abort: image {} not found in AVA.txt, possible data corruption!".format(
+                img_id))
 
-    np.savetxt(output_path, np.asarray(labels), fmt="%f")
+    outDF = pd.DataFrame(labels, index=ids)
+    outDF.to_csv(output_path)
 
 if __name__ == '__main__':
     get_labels_for_images_with_features();
