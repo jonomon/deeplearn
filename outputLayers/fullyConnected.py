@@ -18,18 +18,18 @@ def get_data(feature_filename, ratings_filename):
     XidCol = "Unnamed: 0"
     yidCol = "Unnamed: 0"
     X = pd.read_csv(feature_filename)
+    X[XidCol] = X[XidCol].apply(lambda x: os.path.splitext(os.path.basename(x))[0]).astype(int)
     y = pd.read_csv(ratings_filename)
 
-    Xid = X[XidCol]
-    Xid = Xid.apply(lambda x: os.path.splitext(os.path.basename(x))[0]).astype(int)
-    yid = y[yidCol]
+    X = X.sort(columns = XidCol)
+    y = y.sort(columns = yidCol)
 
-    xiny = np.in1d(Xid, yid)
+    xiny = np.in1d(X[XidCol], y[yidCol])
     X = X.iloc[xiny]
-    newXid = X[XidCol].apply(lambda x: os.path.splitext(os.path.basename(x))[0]).astype(int)
-    if np.sum(newXid == yid) != newXid.shape[0]:
-        print("Labels are not matched")
-        return
+
+    if np.sum(X[XidCol] == y[yidCol]) != X[XidCol].shape[0]:
+        raise Exception("Labels not matched")
+    
     idx = np.random.permutation(len(X))
     X = X.iloc[idx]
     y = y.iloc[idx]
@@ -46,12 +46,12 @@ def get_data(feature_filename, ratings_filename):
     return X.values, y.values
     
 def build_net(dims):
-    lr = 0.01
+    lr = 0.000001
     l_i = InputLayer(shape=(None, dims))
-    l_h = DenseLayer(l_i, num_units=5, nonlinearity=rectify)
-    l_o = DenseLayer(l_h, num_units=1, nonlinearity=None)
-    net = NeuralNet(l_o, max_epochs=100,
-                    batch_iterator_train = BatchIterator(batch_size=32),
+    #l_h = DenseLayer(l_i, num_units=5, nonlinearity=rectify)
+    l_o = DenseLayer(l_i, num_units=1, nonlinearity=None)
+    net = NeuralNet(l_o, max_epochs=2500,
+                    #batch_iterator_train = BatchIterator(batch_size=32),
                     verbose=1, regression=True,
                     update_learning_rate=lr,
                     objective_loss_function=squared_error)
@@ -66,12 +66,7 @@ if __name__ == "__main__":
     X, y = get_data(
         feature_filename=directory_image_features + image_features_filename,
         ratings_filename=directory_image_ratings + ratings_filename)
-    # net = build_net(X.shape[1])
-    # net.fit(X, y)
-    
-    from sklearn.linear_model import LinearRegression
-    from sklearn.cross_validation import cross_val_predict
-    clf = LinearRegression()
-    predicted = cross_val_predict(clf, X, y, cv=10)
-    
+    net = build_net(X.shape[1])
+    net.fit(X, y)
     import pdb; pdb.set_trace();    
+    

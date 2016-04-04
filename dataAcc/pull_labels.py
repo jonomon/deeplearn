@@ -33,7 +33,6 @@ def get_ids():
                 ids.append(line.strip())
     return ids
 
-
 # build the ava.txt file into a dictionary, indexed by image id string
 def build_ava_dictionary():
     ava_dict = {}
@@ -91,7 +90,7 @@ def get_labels_for_images_with_features():
             if image_name is not "":
                 img_ids.append(splitext(basename(image_name))[0])
 
-    ids = get_ids()
+    img_ids = get_ids()
 
     ava_dict = build_ava_dictionary()
 
@@ -102,11 +101,11 @@ def get_labels_for_images_with_features():
     for img_id in img_ids:
         if img_id in ava_dict:
             score = get_score(ava_dict[img_id])
-            if img_id in ids:
+            if img_id in img_ids:
                 labels.append(score)
                 ids.append(img_id)
             else:
-                error("Abort: image not found as train or test, possible data corruption!")
+                error("Abort: image {} not found as train or test, possible data corruption!".format(img_id))
         else:
             print("Abort: image {} not found in AVA.txt, possible data corruption!".format(
                 img_id))
