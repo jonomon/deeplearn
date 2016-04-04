@@ -11,15 +11,18 @@ image_features_file = "../imageFeatures/outputFeatures/image_features.csv"
 train_test_image_dir = "AVA_dataset/aesthetics_image_lists/"
 output_path = "../data/labels/label.csv"
 
+
 def error(str):
     raise StandardError(str);
     exit(-1)
+
 
 # taking average as score
 def get_score(line):
     scores = np.array([int(i) for i in line[2:12]])
     score = np.mean(scores)
     return score
+
 
 # get test and train image ids for food pictures
 def get_ids():
@@ -91,7 +94,7 @@ def get_labels_for_images_with_features():
             if image_name is not "":
                 img_ids.append(splitext(basename(image_name))[0])
 
-    ids = get_ids()
+    all_ids = get_ids()
 
     ava_dict = build_ava_dictionary()
 
@@ -102,7 +105,7 @@ def get_labels_for_images_with_features():
     for img_id in img_ids:
         if img_id in ava_dict:
             score = get_score(ava_dict[img_id])
-            if img_id in ids:
+            if img_id in all_ids:
                 labels.append(score)
                 ids.append(img_id)
             else:

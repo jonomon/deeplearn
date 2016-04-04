@@ -8,11 +8,11 @@ weights_file = 'weights/vgg16_weights.h5'
 img_rows = 224
 img_cols = 224
 
+
 def build_model():
     model = vgg.VGG_16(weights_file)
     sgd = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
     model.compile(optimizer=sgd, loss='categorical_crossentropy')
-
     return model
 
 

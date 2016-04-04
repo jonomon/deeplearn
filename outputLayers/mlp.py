@@ -27,10 +27,16 @@ def buidl_model(x_dim):
 
 
 if __name__ == '__main__':
-
     import dataHelper as data
 
-    x, y = data.load()
+    directory_image_features = "../imageFeatures/outputFeatures/"
+    image_features_filename = "image_features.csv"
+
+    directory_image_ratings = "../data/labels/"
+    ratings_filename = "label.csv"
+    x, y = data.get_data(
+        feature_filename=directory_image_features + image_features_filename,
+        ratings_filename=directory_image_ratings + ratings_filename)
     model = buidl_model(np.shape(x)[1])
 
     model.fit(x, y,
@@ -41,7 +47,7 @@ if __name__ == '__main__':
 
     # print model.predict_proba(x, verbose=1)
 
-    score = model.predict_proba(x, y, batch_size=128, verbose=1)
+    score = model.predict_proba(x, y, verbose=1)
     print np.shape(score)
     print score
 
