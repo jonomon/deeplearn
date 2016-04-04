@@ -1,6 +1,7 @@
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation
 from keras.optimizers import SGD
+from keras.regularizers import l2, activity_l2
 import numpy as np
 
 def buidl_model(x_dim):
@@ -8,18 +9,20 @@ def buidl_model(x_dim):
     # Dense(64) is a fully-connected layer with 64 hidden units.
     # in the first layer, you must specify the expected input data shape:
     # here, 20-dimensional vectors.
-    model.add(Dense(output_dim=64, input_dim=x_dim, init='uniform'))
+    model.add(Dense(output_dim=128, input_dim=x_dim, init='uniform',
+                    W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
     model.add(Activation('linear'))
-    # model.add(Dropout(0.5))
-    model.add(Dense(output_dim=64, input_dim=64, init='uniform'))
+    model.add(Dropout(0.5))
+    model.add(Dense(output_dim=64, input_dim=128, init='uniform',
+                    W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
     model.add(Activation('linear'))
-    # model.add(Dropout(0.5))
-    model.add(Dense(output_dim=1, input_dim=64, init='uniform'))
+    model.add(Dropout(0.5))
+    model.add(Dense(output_dim=1, input_dim=64, init='uniform',
+                    W_regularizer=l2(0.01), activity_regularizer=activity_l2(0.01)))
     model.add(Activation("linear"))
 
     # model.add(Dense(output_dim=1, input_dim=x_dim, init='uniform'))
     # model.add(Activation("linear"))
-
 
     # model.add(Activation('softmax'))
 
@@ -45,7 +48,7 @@ if __name__ == '__main__':
     model = buidl_model(np.shape(x)[1])
 
     model.fit(x, y,
-              nb_epoch=6,
+              nb_epoch=100,
               batch_size=8,
               validation_split=0.1,
               show_accuracy=True,
