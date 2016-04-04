@@ -4,25 +4,25 @@ import pandas as pd
 
 from lasagne.layers import DenseLayer
 from lasagne.layers import InputLayer
-from lasagne.layers import BatchNormLayer
-from lasagne.layers import prelu
 from lasagne.layers import DropoutLayer
 from lasagne.nonlinearities import rectify
 from lasagne.objectives import squared_error
-
+from lasagne.updates import adam
 from nolearn.lasagne import NeuralNet, BatchIterator
 
 from sklearn.preprocessing import StandardScaler
     
 def build_net(dims):
-    lr = 0.000001
+    #lr = 0.000001
     l_i = InputLayer(shape=(None, dims))
-    #l_h = DenseLayer(l_i, num_units=5, nonlinearity=rectify)
-    l_o = DenseLayer(l_i, num_units=1, nonlinearity=None)
+    l_do = DropoutLayer(l_i, p=0.30)
+    #l_h = DenseLayer(l_do, num_units=20, nonlinearity=rectify)
+    l_o = DenseLayer(l_do, num_units=1, nonlinearity=None)
     net = NeuralNet(l_o, max_epochs=2500,
-                    #batch_iterator_train = BatchIterator(batch_size=32),
+                    batch_iterator_train = BatchIterator(batch_size=32),
                     verbose=1, regression=True,
-                    update_learning_rate=lr,
+                    #update_learning_rate=lr,
+                    update=adam,
                     objective_loss_function=squared_error)
     return net
 

@@ -14,8 +14,8 @@ def get_data(feature_filename, ratings_filename):
     X[XidCol] = X[XidCol].apply(lambda x: splitext(basename(x))[0]).astype(int)
     y = pd.read_csv(ratings_filename)
 
-    X = X.sort(columns = XidCol)
-    y = y.sort(columns = yidCol)
+    X = X.sort_values(by = XidCol)
+    y = y.sort_values(by = yidCol)
 
     xiny = np.in1d(X[XidCol], y[yidCol])
     X = X.iloc[xiny]
@@ -23,6 +23,7 @@ def get_data(feature_filename, ratings_filename):
     if np.sum(X[XidCol] == y[yidCol]) != X[XidCol].shape[0]:
         raise Exception("Labels not matched")
 
+    np.random.seed(616)
     idx = np.random.permutation(len(X))
     X = X.iloc[idx]
     y = y.iloc[idx]
