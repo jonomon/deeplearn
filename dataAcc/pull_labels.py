@@ -20,9 +20,12 @@ def error(str):
 # taking average as score
 def get_score(line):
     scores = np.array([int(i) for i in line[2:12]])
-    score = np.mean(scores)
-    return score
-
+    weighted_score = 0.0
+    for i, score in enumerate(scores):
+        i = float(i) 
+        weighted_score += score * (i + 1)
+    average_weighted_score = weighted_score / np.sum(scores)
+    return average_weighted_score
 
 # get test and train image ids for food pictures
 def get_ids():

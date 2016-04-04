@@ -15,8 +15,8 @@ from sklearn.preprocessing import StandardScaler
 def build_net(dims):
     #lr = 0.000001
     l_i = InputLayer(shape=(None, dims))
-    l_do = DropoutLayer(l_i, p=0.30)
-    #l_h = DenseLayer(l_do, num_units=20, nonlinearity=rectify)
+    #l_h = DenseLayer(l_i, num_units=200, nonlinearity=None)
+    l_do = DropoutLayer(l_i, p=0.5)
     l_o = DenseLayer(l_do, num_units=1, nonlinearity=None)
     net = NeuralNet(l_o, max_epochs=2500,
                     batch_iterator_train = BatchIterator(batch_size=32),
