@@ -11,7 +11,7 @@ def get_data(feature_filename, ratings_filename):
     XidCol = "Unnamed: 0"
     yidCol = "Unnamed: 0"
     X = pd.read_csv(feature_filename)
-    X[XidCol] = X[XidCol].apply(lambda x: os.path.splitext(os.path.basename(x))[0]).astype(int)
+    X[XidCol] = X[XidCol].apply(lambda x: splitext(basename(x))[0]).astype(int)
     y = pd.read_csv(ratings_filename)
 
     X = X.sort(columns = XidCol)
