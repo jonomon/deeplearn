@@ -11,18 +11,18 @@ def get_data(feature_filename, ratings_filename):
     XidCol = "Unnamed: 0"
     yidCol = "Unnamed: 0"
     X = pd.read_csv(feature_filename)
+    X[XidCol] = X[XidCol].apply(lambda x: os.path.splitext(os.path.basename(x))[0]).astype(int)
     y = pd.read_csv(ratings_filename)
 
-    Xid = X[XidCol]
-    Xid = Xid.apply(lambda x: splitext(basename(x))[0]).astype(int)
-    yid = y[yidCol]
+    X = X.sort(columns = XidCol)
+    y = y.sort(columns = yidCol)
 
-    xiny = np.in1d(Xid, yid)
+    xiny = np.in1d(X[XidCol], y[yidCol])
     X = X.iloc[xiny]
-    newXid = X[XidCol].apply(lambda x: splitext(basename(x))[0]).astype(int)
-    if np.sum(newXid == yid) != newXid.shape[0]:
-        print("Labels are not matched")
-        return
+
+    if np.sum(X[XidCol] == y[yidCol]) != X[XidCol].shape[0]:
+        raise Exception("Labels not matched")
+
     idx = np.random.permutation(len(X))
     X = X.iloc[idx]
     y = y.iloc[idx]
