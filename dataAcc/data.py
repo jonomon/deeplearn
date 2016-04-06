@@ -46,10 +46,21 @@ def pull_files(image_id, output_folder):
 if __name__ == "__main__":
     in_dir = "AVA_dataset/aesthetics_image_lists/"
     #filenames = glob.glob(in_dir+'*.jpgl')
-    filenames = glob.glob(in_dir + '*fooddrink*.jpgl')
+    # filenames = glob.glob(in_dir + '*fooddrink*.jpgl')
 
-    output_folder = "../data/original/"
+    # output_folder = "../data/original/"
+    # for filename in filenames:
+    #     input_file = pd.read_csv(filename, header=None)
+    #     for idx, row in input_file.iterrows():
+    #         pull_files(row[0], output_folder)
+
+    output_folder_balanced = "../data/balanced/"
+    filenames = glob.glob("balanced_*.csv")
+
     for filename in filenames:
-        input_file = pd.read_csv(filename, header=None)
+        input_file = pd.read_csv(filename, header=0, index_col=0)
+
         for idx, row in input_file.iterrows():
-            pull_files(row[0], output_folder)
+            pull_files(row[0], output_folder_balanced)
+        #     print row[0]
+        #     break;
