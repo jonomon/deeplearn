@@ -20,12 +20,21 @@ def error(str):
 # taking average as score
 def get_score(line):
     scores = np.array([int(i) for i in line[2:12]])
-    weighted_score = 0.0
-    for i, score in enumerate(scores):
-        i = float(i) 
-        weighted_score += score * (i + 1)
-    average_weighted_score = weighted_score / np.sum(scores)
+    # weighted_score = 0.0
+    # for i, score in enumerate(scores):
+    #     i = float(i)
+    #     weighted_score += score * (i + 1)
+    # average_weighted_score = weighted_score / np.sum(scores)
+
+    largest_n = 2;
+    indices = np.argpartition(scores, -largest_n)[-largest_n:]
+    vals = scores[indices]
+    bins = indices + 1
+
+    average_weighted_score = float(np.sum(vals * bins))/np.sum(vals)
+
     return average_weighted_score
+
 
 # get test and train image ids for food pictures
 def get_ids():
@@ -38,6 +47,7 @@ def get_ids():
             for line in infile:
                 ids.append(line.strip())
     return ids
+
 
 # build the ava.txt file into a dictionary, indexed by image id string
 def build_ava_dictionary():
@@ -74,6 +84,7 @@ def get_all_labels():
                 results.append([img_id, score])
 
         np.savetxt(output, np.asarray(results), fmt="%d, %f")
+
 
 
 # look at the \imageFeatures\outputFeatures\image_features.csv and only creates label files for images
@@ -117,8 +128,23 @@ def get_labels_for_images_with_features():
             print("Abort: image {} not found in AVA.txt, possible data corruption!".format(
                 img_id))
 
+    from scipy.interpolate import interp1d
+
+    min_label = np.min(labels)
+    max_label = np.max(labels)
+
+    print min_label
+    print max_label
+    m = interp1d([min_label, max_label], [1, 9])
+
+    # outDF = pd.DataFrame(m(labels), index=ids)
     outDF = pd.DataFrame(labels, index=ids)
+
     outDF.to_csv(output_path)
+
+    # hist, _ = np.histogram(labels, bins=[1,2,3,4,5,6,7,8,9,10])
+    # print hist
+
 
 if __name__ == '__main__':
     get_labels_for_images_with_features()

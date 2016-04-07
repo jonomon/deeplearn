@@ -48,5 +48,37 @@ def get_features_244():
     f = pd.DataFrame(np.concatenate(features), index=filenames)
     f.to_csv("outputFeatures/image_features.csv")
 
+
+def get_features_rot():
+    directory = "../data/rot/"
+
+    model = build_model()
+
+    features = []
+    filenames = []
+    input_images = glob.glob(directory+'/*_1.ppm')
+
+    for i, filename in enumerate(input_images):
+        print("{0}/{1} Analysing {2}".format(i, len(input_images), filename))
+        output = getOutput(model, filename)
+        filenames.append(filename)
+        features.append(output)
+    f = pd.DataFrame(np.concatenate(features), index=filenames)
+    f.to_csv("outputFeatures/image_features_rot_1.csv")
+
+    features = []
+    filenames = []
+    input_images = glob.glob(directory+'/*_2.ppm')
+
+    for i, filename in enumerate(input_images):
+        print("{0}/{1} Analysing {2}".format(i, len(input_images), filename))
+        output = getOutput(model, filename)
+        filenames.append(filename)
+        features.append(output)
+    f = pd.DataFrame(np.concatenate(features), index=filenames)
+    f.to_csv("outputFeatures/image_features_rot_2.csv")
+
+
 if __name__ == '__main__':
-    get_features_244()
+    # get_features_244()
+    get_features_rot()
