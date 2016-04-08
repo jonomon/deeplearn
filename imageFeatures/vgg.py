@@ -56,6 +56,7 @@ def VGG_16(weights_path=None):
     model.add(Dense(4096, activation='relu'))
     # model.add(Dropout(0.5))
     # model.add(Dense(1000, activation='softmax'))
+    # model.add(Dense(1000))
 
     assert os.path.exists(weights_path), 'Model weights not found (see "weights_path" variable in script).'
     f = h5py.File(weights_path)

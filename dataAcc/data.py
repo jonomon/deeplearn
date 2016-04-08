@@ -2,7 +2,7 @@ import pandas as pd
 from urllib2 import urlopen, URLError, HTTPError
 import bs4
 import glob
-
+import os.path as ospath
 
 def file_image_url(image_id, html):
     soup = bs4.BeautifulSoup(html, "lxml")
@@ -43,6 +43,28 @@ def pull_files(image_id, output_folder):
     except Exception as e:
         print e.message
 
+def download_balanced(in_dir):
+    output_folder_balanced = "../data/balanced/"
+    filenames = glob.glob("balanced_*.csv")
+
+    for filename in filenames:
+        input_file = pd.read_csv(filename, header=0, index_col=0)
+
+        for idx, row in input_file.iterrows():
+            if not ospath.isfile(output_folder_balanced + str(row[0]) + ".jpg"):
+                pull_files(row[0], output_folder_balanced)
+
+def download_ava():
+    ava_file = "AVA_dataset/AVA.txt"
+    out_dir = "../data/data_backup/"
+
+    with open(ava_file, 'r') as fh:
+        for line in fh:
+            line = line.split()
+            im_id = line[1]
+            if not ospath.isfile(out_dir + im_id + ".jpg"):
+                pull_files(im_id, out_dir)
+
 if __name__ == "__main__":
     in_dir = "AVA_dataset/aesthetics_image_lists/"
     #filenames = glob.glob(in_dir+'*.jpgl')
@@ -54,13 +76,4 @@ if __name__ == "__main__":
     #     for idx, row in input_file.iterrows():
     #         pull_files(row[0], output_folder)
 
-    output_folder_balanced = "../data/balanced/"
-    filenames = glob.glob("balanced_*.csv")
-
-    for filename in filenames:
-        input_file = pd.read_csv(filename, header=0, index_col=0)
-
-        for idx, row in input_file.iterrows():
-            pull_files(row[0], output_folder_balanced)
-        #     print row[0]
-        #     break;
+    download_ava()

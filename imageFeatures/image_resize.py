@@ -8,7 +8,8 @@ import os
 import glob
 from joblib import Parallel, delayed
 
-in_dir = '../data/original/'
+# in_dir = '../data/original/'
+in_dir = '../data/balanced/'
 out_dir = '../data/resized_224/'
 IMAGE_SIZE = 224
 

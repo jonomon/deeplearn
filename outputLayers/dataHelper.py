@@ -50,6 +50,16 @@ def get_data(feature_filename, ratings_filename):
     return X.values, y.values
 
 
+def get_data_for_classification(features_train, labels_train, features_test, labels_test):
+    x_train = pd.read_csv(features_train, header=0, index_col=0)
+    y_train = pd.read_csv(labels_train, header=0, index_col=0)
+
+    x_test = pd.read_csv(features_test, header=0, index_col=0)
+    y_test = pd.read_csv(labels_test, header=0, index_col=0)
+
+    return x_train.values, y_train.values, x_test.values, y_test.values
+
+
 def get_data_rot(global_features, rot_1, rot_2, ratings_filename):
     g, y = _load_data(global_features, ratings_filename)
     r_1, _ = _load_data(rot_1, ratings_filename, rot_flag=True)
@@ -114,20 +124,32 @@ if __name__ == '__main__':
 
     directory_image_ratings = "../data/labels/"
     ratings_filename = "label.csv"
-    X, y = get_data(
-        feature_filename=directory_image_features + image_features_filename,
-        ratings_filename=directory_image_ratings + ratings_filename)
+
+    train_features_filename = "../imageFeatures/outputFeatures/classification/features_train.csv"
+    train_labels_filename = "../data/classification/train/labels.csv"
+
+    test_features_filename = "../imageFeatures/outputFeatures/classification/features_test.csv"
+    test_labels_filename = "../data/classification/test/labels.csv"
+
+    xt, yt, x, y = get_data_for_classification(features_train=train_features_filename,
+                                               features_test=test_features_filename,
+                                               labels_train=train_labels_filename,
+                                               labels_test=test_labels_filename)
+
+    # X, y = get_data(
+    #     feature_filename=directory_image_features + image_features_filename,
+    #     ratings_filename=directory_image_ratings + ratings_filename)
 
     # X, y = get_data_rot(global_features=directory_image_features + image_features_filename,
     #              rot_1=directory_image_features + rot_1_features_filename,
     #              rot_2=directory_image_features + rot_2_features_filename,
     #              ratings_filename=directory_image_ratings + ratings_filename)
 
-    # print X
-    # print np.shape(X)
+    # print y
+    # print np.shape(y)
 
     # generate_sample_weights(y)
 
     # validation_split(X, y, 0.1)
-    print np.mean(y)
-    print np.std(y)
+    # print np.mean(y)
+    # print np.std(y)

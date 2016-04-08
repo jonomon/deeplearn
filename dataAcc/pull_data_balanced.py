@@ -113,7 +113,7 @@ if __name__ == "__main__":
     food_images_ids = []
     for filename in filenames:
         food_images_ids += get_food_images(filename)
-    print food_images_ids
+
     # get ratings of food/drinks images
     ava_dict = pl.build_ava_dictionary()
 
@@ -141,7 +141,7 @@ if __name__ == "__main__":
     final_food_ids = []
     final_non_food_ids = []
     # try to balance
-    bin_size = 500
+    bin_size = 800
     for k in food_bins.keys():
         if len(food_bins[k]) < bin_size:
             # take photos from nonfood category

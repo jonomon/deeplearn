@@ -49,6 +49,31 @@ def get_features_244():
     f.to_csv("outputFeatures/image_features.csv")
 
 
+def prepare_train_test_features_244(in_dir, train_list, test_list, train_feature_path, test_feature_path):
+    model = build_model()
+
+    get_features_244_classification(model, in_dir, train_list, train_feature_path)
+    get_features_244_classification(model, in_dir, test_list, test_feature_path)
+
+
+def get_features_244_classification(model, in_dir, img_list_file, save_path):
+    features = []
+
+    df = pd.read_csv(img_list_file, header=0, index_col=0)
+    im_ids = []
+    i = 1
+    for img_id in df.values:
+        filename = in_dir + str(img_id[0]) + ".ppm"
+        print("{0}/{1} Analysing {2}".format(i, len(df.values), filename))
+        output = getOutput(model, filename)
+        features.append(output)
+
+        im_ids.append(img_id)
+        i += 1
+    f = pd.DataFrame(np.concatenate(features))
+    f.to_csv(save_path, index=im_ids)
+
+
 def get_features_rot():
     directory = "../data/rot/"
 
@@ -63,6 +88,7 @@ def get_features_rot():
         output = getOutput(model, filename)
         filenames.append(filename)
         features.append(output)
+
     f = pd.DataFrame(np.concatenate(features), index=filenames)
     f.to_csv("outputFeatures/image_features_rot_1.csv")
 
@@ -81,4 +107,16 @@ def get_features_rot():
 
 if __name__ == '__main__':
     # get_features_244()
-    get_features_rot()
+    # get_features_rot()
+
+    img_dir = "../data/resized_224/"
+    train_img_list_file = "../data/classification/train/imgIds.csv"
+    test_img_list_file = "../data/classification/test/imgIds.csv"
+    save_path_train = "outputFeatures/classification/features_train.csv"
+    save_path_test = "outputFeatures/classification/features_test.csv"
+
+    prepare_train_test_features_244(in_dir=img_dir,
+                                    train_list=train_img_list_file,
+                                    test_list=test_img_list_file,
+                                    train_feature_path=save_path_train,
+                                    test_feature_path=save_path_test)

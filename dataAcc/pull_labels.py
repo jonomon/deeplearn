@@ -36,6 +36,35 @@ def get_score(line):
     return average_weighted_score
 
 
+def get_label(line, sigma):
+    score = get_score(line)
+
+    label = -1
+    if score > 5 + sigma:
+        label = 1
+    elif score < 5 - sigma:
+        label = 0
+
+    return label
+
+
+def get_labels(avadict, img_ids, delta):
+    labels = []
+    ids = []
+    for img_id in img_ids:
+        line = avadict[str(img_id)]
+        label = get_label(line, delta)
+
+        # drop invalid labels
+        if label == -1:
+            continue
+        else:
+            # build both score list and image id list
+            labels.append(label)  # int
+            ids.append(img_id)  # int
+    return labels, ids
+
+
 # get test and train image ids for food pictures
 def get_ids():
     #filenames = glob.glob(train_test_image_dir+'*.jpgl')
@@ -59,10 +88,39 @@ def build_ava_dictionary():
 
             img_id = line[1]
             if img_id in ava_dict:
-                error( "Abort: duplicate image found! possible data corruption!")
+                error("Abort: duplicate image found! possible data corruption!")
             else:
                 ava_dict[img_id] = line
     return ava_dict
+
+
+def build_image_list_and_lables(in_dir, out_dir, sigma):
+    # build ava dict
+    ava_dict = build_ava_dictionary()
+
+    # take local images that are already downloaded and get score
+    filenames = glob.glob(in_dir + '*.ppm')
+
+    labels = []
+    img_ids = []
+    for name in filenames:
+        img_id = splitext(basename(name))[0]
+        line = ava_dict[img_id]
+        label = get_label(line, sigma)
+
+        # drop invalid labels
+        if label == -1:
+            continue
+        else:
+            # build both score list and image id list
+            labels.append(label)  # int
+            img_ids.append(int(img_id))  # int
+
+    # write to file
+    df = pd.DataFrame(np.asarray(img_ids))
+    df.to_csv(out_dir + "imgIds.csv")
+    df = pd.DataFrame(np.asarray(labels))
+    df.to_csv(out_dir + "labels.csv")
 
 
 # save both training and test images labels for ALL images
@@ -86,7 +144,6 @@ def get_all_labels():
         np.savetxt(output, np.asarray(results), fmt="%d, %f")
 
 
-
 # look at the \imageFeatures\outputFeatures\image_features.csv and only creates label files for images
 # present in the image_features.csv file
 def get_labels_for_images_with_features():
@@ -107,8 +164,6 @@ def get_labels_for_images_with_features():
             if image_name is not "":
                 img_ids.append(splitext(basename(image_name))[0])
 
-    all_ids = get_ids()
-
     ava_dict = build_ava_dictionary()
 
     # train & test images combined!
@@ -119,11 +174,8 @@ def get_labels_for_images_with_features():
         if img_id in ava_dict:
             score = get_score(ava_dict[img_id])
 
-            if img_id in all_ids:
-                labels.append(score)
-                ids.append(img_id)
-            else:
-                error("Abort: image {} not found as train or test, possible data corruption!".format(img_id))
+            labels.append(score)
+            ids.append(img_id)
         else:
             print("Abort: image {} not found in AVA.txt, possible data corruption!".format(
                 img_id))
@@ -142,9 +194,55 @@ def get_labels_for_images_with_features():
 
     outDF.to_csv(output_path)
 
-    # hist, _ = np.histogram(labels, bins=[1,2,3,4,5,6,7,8,9,10])
-    # print hist
+    hist, _ = np.histogram(labels, bins=[1,2,3,4,5,6,7,8,9,10])
+    print hist
+
+
+def prepare_data_for_classification(in_dir, out_dir_train, out_dir_test, delta_train, delta_test, test_size):
+    # build ava dict
+    ava_dict = build_ava_dictionary()
+
+    # take local images that are already downloaded and get the image list
+    filenames = glob.glob(in_dir + '*.ppm')
+
+    img_ids = []
+    for name in filenames:
+        img_id = splitext(basename(name))[0]
+        img_ids.append(int(img_id))
+
+    if test_size > len(img_ids):
+        raise Exception("test set larger than image set")
+
+    # randomly split test and train
+    img_ids = np.asarray(img_ids)
+    np.random.shuffle(img_ids)
+    train_ids, test_ids = img_ids[test_size:], img_ids[:test_size]
+
+    # get labels for both train and test
+    train_labels, train_ids = get_labels(ava_dict, train_ids, delta_train)
+    test_labels, test_ids = get_labels(ava_dict, test_ids, delta_test)
+
+    # write to file
+    df = pd.DataFrame(train_ids)
+    df.to_csv(out_dir_train + "imgIds.csv")
+    df = pd.DataFrame(np.asarray(train_labels))
+    df.to_csv(out_dir_train + "labels.csv")
+
+    df = pd.DataFrame(test_ids)
+    df.to_csv(out_dir_test + "imgIds.csv")
+    df = pd.DataFrame(np.asarray(test_labels))
+    df.to_csv(out_dir_test + "labels.csv")
 
 
 if __name__ == '__main__':
-    get_labels_for_images_with_features()
+    # get_labels_for_images_with_features()
+    in_dir = "../data/resized_224/"
+    out_dir_train = "../data/classification/train/"
+    out_dir_test = "../data/classification/test/"
+
+    prepare_data_for_classification(in_dir=in_dir,
+                                    out_dir_train=out_dir_train,
+                                    out_dir_test=out_dir_test,
+                                    delta_train=0,
+                                    delta_test=0,
+                                    test_size=500)
