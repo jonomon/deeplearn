@@ -52,17 +52,18 @@ def get_labels(avadict, img_ids, delta):
     labels = []
     ids = []
     for img_id in img_ids:
-        line = avadict[str(img_id)]
-        label = get_label(line, delta)
+        if str(img_id) in avadict:
+            line = avadict[str(img_id)]
+            label = get_label(line, delta)
 
-        # drop invalid labels
-        if label == -1:
-            continue
-        else:
-            # build both score list and image id list
-            labels.append(label)  # int
-            ids.append(img_id)  # int
-    return labels, ids
+            # drop invalid labels
+            if label == -1:
+                continue
+            else:
+                # build both score list and image id list
+                labels.append(label)  # int
+                ids.append(img_id)  # int
+        return labels, ids
 
 
 # get test and train image ids for food pictures

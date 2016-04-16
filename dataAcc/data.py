@@ -3,6 +3,9 @@ from urllib2 import urlopen, URLError, HTTPError
 import bs4
 import glob
 import os.path as ospath
+from joblib import Parallel, delayed
+import os
+import numpy as np
 
 def file_image_url(image_id, html):
     soup = bs4.BeautifulSoup(html, "lxml")
@@ -25,13 +28,13 @@ def file_image_url(image_id, html):
     return img_url
 
 
-def pull_files(image_id, output_folder):
+def pull_files(image_id, output_folder, i):
     url_base = "http://www.dpchallenge.com/image.php?IMAGE_ID="
     url = url_base + str(image_id)
     output_filename = output_folder + str(image_id) + ".jpg"
     try:
         f = urlopen(url)
-        print "downloading " + url
+        print str(i) + " downloading " + url
         image_url = file_image_url(image_id, f.read())
         img = urlopen(image_url)
         with open(output_filename, "wb") as local_file:
@@ -58,13 +61,19 @@ def download_ava():
     ava_file = "AVA_dataset/AVA.txt"
     out_dir = "../data/data_backup/"
 
-    with open(ava_file, 'r') as fh:
-        for line in fh:
-            line = line.split()
-            im_id = line[1]
-            if not ospath.isfile(out_dir + im_id + ".jpg"):
-                pull_files(im_id, out_dir)
+    ava_file = "../dataAcc/AVA_dataset/AVA.txt"
+    ava = pd.read_csv(ava_file, sep=" ", header=None).set_index(1).drop(0, axis=1)
 
+    paths = glob.glob(out_dir + "*jpg")
+    paths2 = []
+    for path in paths:
+        basename = os.path.basename(path)
+        paths2.append(basename.split('.')[0])
+    not_in_path_idx = np.in1d(ava.index, paths2)
+    toDownload = ava.index[np.logical_not(not_in_path_idx)]
+    Parallel(n_jobs=32, verbose=10)(
+        delayed(pull_files)(f, out_dir, i) for i, f in enumerate(toDownload))
+    
 if __name__ == "__main__":
     in_dir = "AVA_dataset/aesthetics_image_lists/"
     #filenames = glob.glob(in_dir+'*.jpgl')
